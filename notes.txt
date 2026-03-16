@@ -1,0 +1,45 @@
+WebhookPipeline/
+├── node_modules/
+├── src/            <-- TypeScript
+│   ├── api/        <-- Express
+│   ├── worker/     <-- كود المعالجة في الخلفية
+│   ├── db/         <-- Postgres
+│   └── index.ts    <-- 
+├── dist/           <-- Build
+├── Dockerfile
+├── docker-compose.yml
+├── package.json
+├── tsconfig.json
+└── .gitignore
+
+
+
+##- TimeLine [Takes]:
+    #1. GitHub Repository -> WebhookPipeline
+    
+    #2. Create TypeScript Project:
+        . npm init -y
+        . npm install -D typescript
+        . npx tsc --init  -> [tsconfig.json]
+        . npx tsc         -> [TS - JS] 
+        . node src/index.js   -> Run
+    
+    #3. Strict Mode: True  <---> "use strict";
+
+    #4. ESLint & Prettier: 
+        . ESLint -> [bugs, styling issues, JavaScript, TypeScript, JSX] -> Before Run time
+        . Prettier -> Code Formatter
+        . Create .eslintrc.json file
+        . Create .prettierrc file
+    
+    #5. Dockerization:
+        . .dockerignore file
+        . Dockerfile [Multi-stage builds -> Minimize image size]
+        . docker-compose.yml
+        . .env file
+        . Build Image -> docker build -t my-ts-app 
+        . Run Container -> docker run -p 3000:3000 my-ts-app
+
+    #6. GitHub Actions:
+        . .github/workflows/main.yml
+

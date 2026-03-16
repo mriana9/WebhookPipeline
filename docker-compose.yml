@@ -1,0 +1,27 @@
+version: '3.8'
+
+services: #Add containers[db, app]
+  db:
+    image: postgres:15-alpine
+    restart: always 
+    environment:
+      POSTGRES_USER: ${DB_USER} #from .env file
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}     
+    ports:
+      - "5432:5432"                   
+    volumes:  
+      - postgres_data:/var/lib/postgresql/data
+
+  app: # my TS App Project
+    build: .                           
+    ports:
+      - "3000:3000"                    
+    environment:
+    DATABASE_URL: ${DATABASE_URL} # from .env file
+    PORT: 3000
+    depends_on: #start after db complated
+      - db                             
+
+volumes: #Store/Save db
+  postgres_data:                      
