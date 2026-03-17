@@ -82,3 +82,9 @@
         - npm i -D drizzle-kit
         - src/db/schema.ts file
         - drizzle.config.ts file
+        - npm i dotenv -> to read db_url from .env
+        - npx drizzle-kit generate
+        - npx drizzle-kit migrate
+        -  docker-compose up -d db -> to run database
+        - npx drizzle-kit push
+        - npm i postgres
