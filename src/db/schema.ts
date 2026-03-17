@@ -25,6 +25,7 @@ export const jobs = pgTable('jobs', {
   status: text('status').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  retryCount: integer('retry_count').default(0).notNull(),
 });
 
 export const delivery_attempts = pgTable('delivery_attempts', {

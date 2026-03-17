@@ -1,7 +1,13 @@
 'use strict';
 
 import express from 'express';
-import { createPipeline, getAllPiplines, jobtoWebhook } from './services/pipeline.service.js';
+import {
+  createPipeline,
+  getAllPiplines,
+  getAttemptsByJobId,
+  jobtoWebhook,
+} from './services/pipeline.service.js';
+import { processJobs } from './services/worker.service.js';
 
 const app = express();
 app.use(express.json());
@@ -50,6 +56,21 @@ app.post('/receive/:sourceKey', async (req, res) => {
     res.status(500).json({ error: 'Failed to process webhook' });
   }
 });
+
+// Endpoint.4 [Read Delivery Attempts for a Job]
+app.get('/jobs/:jobId/attempts', async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const history = await getAttemptsByJobId(jobId);
+    res.status(200).json(history);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch delivery attempts' });
+  }
+});
+
+setInterval(() => {
+  processJobs();
+}, 10000); // Work after 10s
 
 //Run Server on port 3000 -> npm run dev
 const PORT = 3000;

@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { db } from 'src/db';
-import { jobs, pipelines } from 'src/db/schema';
+import { delivery_attempts, jobs, pipelines } from 'src/db/schema';
 
 interface Pipeline {
   name: string;
@@ -40,9 +40,18 @@ export async function jobtoWebhook(sourceKey: string, payload: any) {
     .values({
       pipeline_id: pipeline.id,
       payload: payload,
-      status: 'pending', 
+      status: 'pending',
     })
     .returning();
 
   return newJob;
+}
+
+// Get all Attempts for a SPECIFIC job to see its history
+export async function getAttemptsByJobId(jobId: string) {
+  const result = await db
+    .select()
+    .from(delivery_attempts)
+    .where(eq(delivery_attempts.job_id, jobId)); // Filter by job id
+  return result;
 }
