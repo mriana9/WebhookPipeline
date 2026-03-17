@@ -1,7 +1,6 @@
 import { eq } from 'drizzle-orm';
-import { db } from 'src/db';
-import { delivery_attempts, jobs, pipelines } from 'src/db/schema';
-
+import { db } from '../db';
+import { delivery_attempts, jobs, pipelines } from '../db/schema';
 interface Pipeline {
   name: string;
   actionType: string;
