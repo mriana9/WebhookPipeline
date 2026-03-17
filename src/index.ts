@@ -16,14 +16,15 @@ const app = express();
 app.use(express.json());
 
 // Dashboard Setup
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const rootPath = process.cwd(); 
 
-app.use(express.static(path.join(__dirname, '..')));
+
+app.use(express.static(rootPath));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../index.html'));
+  res.sendFile(path.join(rootPath, 'index.html'));
 });
+
 
 //Endpoint.1 [Add Pipline]
 app.post('/pipelines', async (req, res) => {
@@ -100,7 +101,7 @@ setInterval(() => {
 }, 10000); // Work after 10s
 
 //Run Server on port 3000 -> npm run dev
-// process.env.PORT -> Render 
+// process.env.PORT -> Render
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
