@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarkasha Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-[#fdfaf6] text-slate-800 font-sans">
+
+    <nav
+        class="bg-white border-b border-rose-100 px-8 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+        <div class="flex items-center gap-2">
+            <div class="bg-rose-500 p-2 rounded-lg text-white">
+                <i data-lucide="scissors"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-rose-600 tracking-tight">زركشة | Zarkasha</h1>
+        </div>
+        <button
+            class="flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-full transition-all shadow-md">
+            <i data-lucide="plus-circle"></i>
+            <span>Pipeline جديد</span>
+        </button>
+    </nav>
+
+    <main class="p-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-rose-50 flex items-center gap-4">
+                <div class="bg-green-100 p-3 rounded-xl text-green-600"><i data-lucide="check-circle-2"></i></div>
+                <div>
+                    <p class="text-sm text-slate-500">طلبات مكتملة</p>
+                    <p id="stats-completed" class="text-2xl font-bold">0</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-rose-50 flex items-center gap-4">
+                <div class="bg-yellow-100 p-3 rounded-xl text-yellow-600"><i data-lucide="clock"></i></div>
+                <div>
+                    <p class="text-sm text-slate-500">قيد المعالجة</p>
+                    <p id="stats-pending" class="text-2xl font-bold">0</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-rose-50 flex items-center gap-4">
+                <div class="bg-red-100 p-3 rounded-xl text-red-600"><i data-lucide="x-circle"></i></div>
+                <div>
+                    <p class="text-sm text-slate-500">طلبات فاشلة</p>
+                    <p id="stats-failed" class="text-2xl font-bold">0</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-rose-50 overflow-hidden">
+            <div class="px-6 py-4 border-b border-rose-50 flex justify-between items-center">
+                <h2 class="text-lg font-semibold flex items-center gap-2">
+                    <i data-lucide="history" class="text-rose-500"></i>
+                    سجل طلبات زركشة الأخير
+                </h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-rose-50/30 text-slate-500 text-sm">
+                            <th class="px-6 py-4 font-medium">الـ ID</th>
+                            <th class="px-6 py-4 font-medium">البيانات (Payload)</th>
+                            <th class="px-6 py-4 font-medium text-center">الحالة</th>
+                            <th class="px-6 py-4 font-medium">التوقيت</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobs-table-body" class="divide-y divide-rose-50 text-sm">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="dist/dashboard.js"></script>
+    <script>lucide.createIcons();</script>
+</body>
+
+</html>

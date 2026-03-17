@@ -29,6 +29,11 @@ export async function getAllPiplines() {
   return result;
 }
 
+//Delete Pipline
+export async function deletePipeline(id: string) {
+  await db.delete(pipelines).where(eq(pipelines.id, id));
+}
+
 // Job to Wwbhook
 export async function jobtoWebhook(sourceKey: string, payload: any) {
   const [pipeline] = await db.select().from(pipelines).where(eq(pipelines.sourceKey, sourceKey));

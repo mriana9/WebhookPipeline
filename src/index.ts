@@ -3,6 +3,7 @@
 import express from 'express';
 import {
   createPipeline,
+  deletePipeline,
   getAllPiplines,
   getAttemptsByJobId,
   jobtoWebhook,
@@ -65,6 +66,20 @@ app.get('/jobs/:jobId/attempts', async (req, res) => {
     res.status(200).json(history);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch delivery attempts' });
+  }
+});
+
+// Endpoint: Delete a specific pipeline
+app.delete('/pipelines/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Delete the pipeline from DB
+    await deletePipeline(id);
+
+    res.status(200).json({ message: 'Pipeline deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete pipeline' });
   }
 });
 
