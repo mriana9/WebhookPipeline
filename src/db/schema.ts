@@ -2,8 +2,8 @@ import { pgTable, timestamp, uuid, text, jsonb, integer } from 'drizzle-orm/pg-c
 
 export const pipelines = pgTable('pipelines', {
   id: uuid('id').primaryKey().defaultRandom().notNull(),
-  name: text('name').notNull().unique(),
-  sourceKey: uuid('source_key').defaultRandom().notNull().unique(),
+  name: text('name').notNull(),
+  sourceKey: uuid('source_key').notNull().defaultRandom(),
   //(TRANSFORM, FILTER, ENRICH)
   actionType: text('action_type').notNull(),
   destinationUrl: text('destination_url').notNull(),

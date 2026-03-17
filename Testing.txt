@@ -1,0 +1,13 @@
+## - Thunder Client Extension:
+    - npm run dev
+  #1. Add Pipline Endpoint:
+        . POST 
+        . http://localhost:3000/pipelines
+        . JSON
+        . body:
+            {
+                "name": "Zarkasha Notification",
+                "actionType": "webhook",
+                "destinationUrl": "https://example.com/api/notify"
+            }
+        . Send

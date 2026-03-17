@@ -58,7 +58,7 @@
     ##جدول المهام jobs:
         - هذا الجدول يسجل كل Webhook "يطرق بابنا".
 
-        - id -> UUID
+        - id -> UUID [Universally Unique Identifier]
         - pipeline_id -> UUID [مفتاح أجنبي يربط المهمة بالـ Pipeline الخاص بها]
         - payload ->  JSONB [هنا سنخزن البيانات التي وصلت كما هي]
         - status: VARCHAR [pending, processing, completed, failed]

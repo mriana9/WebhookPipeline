@@ -1,34 +1,12 @@
 'use strict';
 
-import { db } from './db/index.js';
 import express from 'express';
-import { pipelines } from './db/schema.js';
+import { createPipeline, getAllPiplines } from './services/pipeline.service.js';
 
 const app = express();
 app.use(express.json());
 
-interface Pipeline {
-  name: string;
-  actionType: string;
-  destinationUrl: string;
-  actionConfig?: any;
-}
-
-export async function createPipeline(pipeline: Pipeline) {
-  const [result] = await db
-    .insert(pipelines)
-    .values({
-      name: pipeline.name,
-      actionType: pipeline.actionType,
-      destinationUrl: pipeline.destinationUrl,
-      actionConfig: pipeline.actionConfig,
-    })
-    .returning();
-
-  return result;
-}
-
-//Endpoint [Add Pipline]
+//Endpoint.1 [Add Pipline]
 app.post('/pipelines', async (req, res) => {
   try {
     const result = await createPipeline(req.body);
@@ -36,6 +14,16 @@ app.post('/pipelines', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//Endpoint.2 [Read Pipline]
+app.get('/pipelines', async (req, res) => {
+  try {
+    const allPipelines = await getAllPiplines();
+    res.status(200).json(allPipelines);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch pipelines' });
   }
 });
 
