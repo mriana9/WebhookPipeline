@@ -1,5 +1,6 @@
+import { eq } from 'drizzle-orm';
 import { db } from 'src/db';
-import { pipelines } from 'src/db/schema';
+import { jobs, pipelines } from 'src/db/schema';
 
 interface Pipeline {
   name: string;
@@ -26,4 +27,22 @@ export async function createPipeline(pipeline: Pipeline) {
 export async function getAllPiplines() {
   const result = await db.select().from(pipelines);
   return result;
+}
+
+// Job to Wwbhook
+export async function jobtoWebhook(sourceKey: string, payload: any) {
+  const [pipeline] = await db.select().from(pipelines).where(eq(pipelines.sourceKey, sourceKey));
+  if (!pipeline) return null;
+
+  // create new job, status pending
+  const [newJob] = await db
+    .insert(jobs)
+    .values({
+      pipeline_id: pipeline.id,
+      payload: payload,
+      status: 'pending', 
+    })
+    .returning();
+
+  return newJob;
 }

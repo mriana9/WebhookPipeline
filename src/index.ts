@@ -1,7 +1,7 @@
 'use strict';
 
 import express from 'express';
-import { createPipeline, getAllPiplines } from './services/pipeline.service.js';
+import { createPipeline, getAllPiplines, jobtoWebhook } from './services/pipeline.service.js';
 
 const app = express();
 app.use(express.json());
@@ -24,6 +24,30 @@ app.get('/pipelines', async (req, res) => {
     res.status(200).json(allPipelines);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch pipelines' });
+  }
+});
+
+//Endpoint.3 [Add Webhook]
+app.post('/receive/:sourceKey', async (req, res) => {
+  try {
+    const { sourceKey } = req.params;
+    const payload = req.body;
+
+    const job = await jobtoWebhook(sourceKey, payload);
+
+    if (!job) {
+      return res.status(404).json({ error: 'Pipeline not found' });
+    }
+
+    // Accepted
+    res.status(202).json({
+      message: 'Webhook received and queued',
+      jobId: job.id,
+      status: job.status,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to process webhook' });
   }
 });
 

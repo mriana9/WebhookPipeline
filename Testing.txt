@@ -11,3 +11,19 @@
                 "destinationUrl": "https://example.com/api/notify"
             }
         . Send
+    
+    #2. GET All Piplines Endpoint:
+        . Get
+        . http://localhost:3000/pipelines
+        . Send
+
+    #3. POST Receive Webhook Endpoint:
+        . Post 
+        . Get Pipline sourceKey [a591c015-3e3e-4b1e-8d8c-5f7b1589952d]
+        . http://localhost:3000/receive/a591c015-3e3e-4b1e-8d8c-5f7b1589952d
+        . JSON
+        . body:
+            { "event": "user_signup", "email": "test@example.com" }
+        . Send
+
+
