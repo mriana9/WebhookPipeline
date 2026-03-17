@@ -1,4 +1,4 @@
-import { pgTable, timestamp, uuid, text, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, timestamp, uuid, text, jsonb, integer } from 'drizzle-orm/pg-core';
 
 export const pipelines = pgTable('pipelines', {
   id: uuid('id').primaryKey().defaultRandom().notNull(),
@@ -25,4 +25,14 @@ export const jobs = pgTable('jobs', {
   status: text('status').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const delivery_attempts = pgTable('delivery_attempts', {
+  id: uuid('id').primaryKey().defaultRandom().notNull(),
+  job_id: uuid('job_id')
+    .notNull()
+    .references(() => jobs.id, { onDelete: 'cascade' }),
+  response_status: integer('response_status'), // 200 -> Success || 500 Faild
+  error_log: text('error_log'),
+  attempt_number: integer('attempt_number'),
 });
