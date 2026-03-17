@@ -1,19 +1,3 @@
-WebhookPipeline/
-├── node_modules/
-├── src/            <-- TypeScript
-│   ├── api/        <-- Express
-│   ├── worker/     <-- كود المعالجة في الخلفية
-│   ├── db/         <-- Postgres
-│   └── index.ts    <-- 
-├── dist/           <-- Build
-├── Dockerfile
-├── docker-compose.yml
-├── package.json
-├── tsconfig.json
-└── .gitignore
-
-
-
 ##- TimeLine [Takes]:
     #1. GitHub Repository -> WebhookPipeline
     
@@ -43,3 +27,57 @@ WebhookPipeline/
     #6. GitHub Actions:
         . .github/workflows/main.yml
 
+-----------------------------------------------------------------------------------------------------------------------------
+
+    #1. Database Schema Design:
+        . Pipelines Table:
+            . أين سنستقبل البيانات؟
+            . ماذا سنفعل بها؟ 
+            . إلى أين سنرسلها؟
+        . Jobs Table:
+            . متى وصل كل webhook?
+            . ما هي البيانات (Payload)?
+            . حالته: Pending, Processing, Completed, Failed
+        . Logs Table:
+            . لتسجيل محاولات الإرسال للمشتركين، خاصة لو فشلت المحاولة الأولى واحتاج النظام لإعادة المحاولة
+    
+    
+    ##جدول المسارات pipelines 
+        - هذا الجدول هو "العقل" الذي يعرف النظام بماذا يفعل.
+
+        - id -> UUID
+        - name -> VARCHAR
+        - source_key -> UNIQUE INDEX [سلسلة نصية فريدة تكون جزءاً من الرابط الذي سنعطيه للمرسل، لنميز لمن هذا الـ Webhook]
+        - action_type -> VARCHAR [TRANSFORM, FILTER, ENRICH]
+        - destination_url -> TEXT
+        - action_config -> JSONB
+        - createdAt -> TIMESTAMP
+        - updatedAt -> TIMESTAMP
+
+    
+    ##جدول المهام jobs:
+        - هذا الجدول يسجل كل Webhook "يطرق بابنا".
+
+        - id -> UUID
+        - pipeline_id -> UUID [مفتاح أجنبي يربط المهمة بالـ Pipeline الخاص بها]
+        - payload ->  JSONB [هنا سنخزن البيانات التي وصلت كما هي]
+        - status: VARCHAR [pending, processing, completed, failed]
+        - created_at -> TIMESTAMP
+        - processed_payload -> JSONB
+
+    
+    ##جدول محاولات الإرسال delivery_attempts
+        - بما أن المطلوب في المشروع هو Retry Logic، فهذا الجدول ضروري جداً لمراقبة الفشل.
+
+        - id -> UUID
+        - job_id -> UUID [مربوط بالـ Job]
+        - response_status -> INTEGER [مثلاً 200 إذا نجح، أو 500 إذا فشل رابط المشترك]
+        - error_log -> TEXT [إذا فشل الإرسال، نخزن هنا رسالة الخطأ لنعرف السبب]
+        - attempt_number -> INTEGER (عدد المحاولات)
+
+-----------------------------------------------------------------------------------------------------------------------------
+    #1. Drizzle ORM
+        - مكتبة حديثة وخفيفة الوزن لربط الكائنات بقواعد البيانات العلائقية
+        - npm i drizzle-orm postgres
+        - npm i -D drizzle-kit
+        - src/db/schema.ts file
