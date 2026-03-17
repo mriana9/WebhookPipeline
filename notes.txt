@@ -88,3 +88,7 @@
         -  docker-compose up -d db -> to run database
         - npx drizzle-kit push
         - npm i postgres
+        - npm install express || npm install -D @types/express
+        - npm run dev
+        - Thunder Client Extension
+
