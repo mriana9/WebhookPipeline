@@ -1,81 +1,171 @@
-<div id="pipeline-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
-        <h2 class="text-xl font-bold mb-4 text-rose-600">إضافة مسار (Pipeline) جديد</h2>
-        <div class="space-y-4">
-            <input type="text" id="p-name" placeholder="اسم المسار (مثلاً: طلبات إنستا)"
-                class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-rose-300">
-            <input type="text" id="p-key" placeholder="المفتاح (Source Key)"
-                class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-rose-300">
-            <input type="text" id="p-url" placeholder="رابط الـ Endpoint"
-                class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-rose-300">
-            <div class="flex gap-2">
-                <button onclick="savePipeline()"
-                    class="flex-1 bg-rose-500 text-white py-3 rounded-lg font-bold">حفظ</button>
-                <button onclick="toggleModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-lg">إلغاء</button>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zarkasha Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-[#fdfaf6] text-slate-800 font-sans">
+
+    <div id="pipeline-modal"
+        class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl transform transition-all">
+            <h2 class="text-xl font-bold mb-6 text-rose-600 flex items-center gap-2">
+                <i data-lucide="plus-circle"></i> إضافة مسار جديد
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">اسم المسار</label>
+                    <input type="text" id="p-name" placeholder="مثلاً: طلبات إنستا"
+                        class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-300">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">المفتاح (Source Key)</label>
+                    <input type="text" id="p-key" placeholder="insta-1"
+                        class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-300">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">رابط الـ Endpoint</label>
+                    <input type="text" id="p-url" placeholder="https://..."
+                        class="w-full p-3 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-300">
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="savePipeline()"
+                        class="flex-1 bg-rose-500 hover:bg-rose-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-rose-100 transition-all">حفظ</button>
+                    <button onclick="toggleModal()"
+                        class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 py-3 rounded-xl transition-all">إلغاء</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    function toggleModal() {
-        const modal = document.getElementById('pipeline-modal');
-        modal.classList.toggle('hidden');
-    }
+    <nav
+        class="bg-white border-b border-rose-100 px-8 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+        <div class="flex items-center gap-2">
+            <div class="bg-rose-500 p-2 rounded-lg text-white">
+                <i data-lucide="scissors"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-rose-600 tracking-tight">زركشة | Zarkasha</h1>
+        </div>
+        <button onclick="toggleModal()"
+            class="flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white px-6 py-2 rounded-full transition-all shadow-md shadow-rose-100">
+            <i data-lucide="plus-circle"></i>
+            <span class="font-bold">Pipeline جديد</span>
+        </button>
+    </nav>
 
-    document.querySelector('nav button').onclick = toggleModal;
+    <main class="p-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-rose-50 flex items-center gap-4">
+                <div class="bg-green-100 p-3 rounded-xl text-green-600"><i data-lucide="check-circle-2"></i></div>
+                <div>
+                    <p class="text-sm text-slate-500 font-medium">طلبات مكتملة</p>
+                    <p id="stats-completed" class="text-2xl font-bold text-slate-800">0</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-rose-50 flex items-center gap-4">
+                <div class="bg-yellow-100 p-3 rounded-xl text-yellow-600"><i data-lucide="clock"></i></div>
+                <div>
+                    <p class="text-sm text-slate-500 font-medium">قيد المعالجة</p>
+                    <p id="stats-pending" class="text-2xl font-bold text-slate-800">0</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-rose-50 flex items-center gap-4">
+                <div class="bg-red-100 p-3 rounded-xl text-red-600"><i data-lucide="x-circle"></i></div>
+                <div>
+                    <p class="text-sm text-slate-500 font-medium">طلبات فاشلة</p>
+                    <p id="stats-failed" class="text-2xl font-bold text-slate-800">0</p>
+                </div>
+            </div>
+        </div>
 
-    async function loadDashboardData() {
-        try {
-            const resPipelines = await fetch('/pipelines');
-            const pipelines = await resPipelines.json();
-
-
-            const tableBody = document.getElementById('jobs-table-body');
-
-            if (pipelines.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400">لا توجد طلبات بعد.. ابدأي بإضافة Pipeline</td></tr>`;
-            } else {
-                tableBody.innerHTML = pipelines.map(p => `
-                        <tr class="hover:bg-rose-50/20 transition-colors">
-                            <td class="px-6 py-4 font-mono text-xs text-rose-400">#${p.id.slice(0, 8)}</td>
-                            <td class="px-6 py-4 font-medium">${p.name}</td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs">نشط</span>
-                            </td>
-                            <td class="px-6 py-4 text-slate-400 text-xs">${new Date().toLocaleTimeString('ar-SA')}</td>
+        <div class="bg-white rounded-2xl shadow-sm border border-rose-50 overflow-hidden">
+            <div class="px-6 py-4 border-b border-rose-50 flex justify-between items-center bg-rose-50/20">
+                <h2 class="text-lg font-bold flex items-center gap-2">
+                    <i data-lucide="history" class="text-rose-500"></i> سجل طلبات زركشة الأخير
+                </h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="bg-rose-50/30 text-slate-500 text-sm">
+                            <th class="px-6 py-4 font-bold">الـ ID</th>
+                            <th class="px-6 py-4 font-bold">المسار (Pipeline)</th>
+                            <th class="px-6 py-4 font-bold text-center">الحالة</th>
+                            <th class="px-6 py-4 font-bold">التوقيت</th>
                         </tr>
-                    `).join('');
+                    </thead>
+                    <tbody id="jobs-table-body" class="divide-y divide-rose-50">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleModal() {
+            const modal = document.getElementById('pipeline-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        async function loadDashboardData() {
+            try {
+                const res = await fetch('/pipelines');
+                const pipelines = await res.json();
+                const tableBody = document.getElementById('jobs-table-body');
+
+                if (pipelines.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-20 text-slate-400 font-medium">لا توجد سجلات بعد.. ابدأي بإضافة مسار جديد! ✨</td></tr>`;
+                    return;
+                }
+
+                tableBody.innerHTML = pipelines.map(p => `
+                    <tr class="hover:bg-rose-50/30 transition-all group">
+                        <td class="px-6 py-4 font-mono text-xs text-rose-400 font-bold">#${p.id.slice(0, 8)}</td>
+                        <td class="px-6 py-4 font-bold text-slate-700">${p.name}</td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="bg-green-100 text-green-700 px-4 py-1 rounded-full text-xs font-bold border border-green-200">نشط</span>
+                        </td>
+                        <td class="px-6 py-4 text-slate-400 text-xs">${new Date().toLocaleTimeString('ar-SA')}</td>
+                    </tr>
+                `).join('');
+
+                lucide.createIcons();
+            } catch (err) {
+                console.error("خطأ في التحميل:", err);
             }
-
-            lucide.createIcons();
-        } catch (err) {
-            console.error("خطأ في جلب البيانات:", err);
         }
-    }
 
-    async function savePipeline() {
-        const data = {
-            name: document.getElementById('p-name').value,
-            sourceKey: document.getElementById('p-key').value,
-            endpointUrl: document.getElementById('p-url').value
-        };
+        async function savePipeline() {
+            const data = {
+                name: document.getElementById('p-name').value,
+                sourceKey: document.getElementById('p-key').value,
+                endpointUrl: document.getElementById('p-url').value
+            };
 
-        const res = await fetch('/pipelines', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
+            const res = await fetch('/pipelines', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
 
-        if (res.ok) {
-            toggleModal();
-            loadDashboardData(); 
+            if (res.ok) {
+                toggleModal();
+                loadDashboardData();
+                document.getElementById('p-name').value = "";
+                document.getElementById('p-key').value = "";
+                document.getElementById('p-url').value = "";
+            }
         }
-    }
 
-    loadDashboardData();
-    setInterval(loadDashboardData, 10000); 
-
-    lucide.createIcons();
-</script>
+        loadDashboardData();
+    </script>
 </body>
+
+</html>
