@@ -16,8 +16,7 @@ const app = express();
 app.use(express.json());
 
 // Dashboard Setup
-const rootPath = process.cwd(); 
-
+const rootPath = process.cwd();
 
 app.use(express.static(rootPath));
 
@@ -25,6 +24,9 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(rootPath, 'index.html'));
 });
 
+app.get('/order', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'order.html'));
+});
 
 //Endpoint.1 [Add Pipline]
 app.post('/pipelines', async (req, res) => {

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلب جديد | زركشة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden border border-pink-100">
+        <div class="bg-pink-600 p-6 text-center text-white">
+            <h1 class="text-2xl font-bold">زركشة | Zarkasha</h1>
+            <p class="text-pink-100 mt-2">أرسلي تفاصيل طلبكِ وسنتواصل معكِ</p>
+        </div>
+
+        <div class="p-8 space-y-4">
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">الاسم الكريم</label>
+                <input type="text" id="customerName" placeholder="مثال: سارة أحمد"
+                    class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none transition-all">
+            </div>
+
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">تفاصيل الطلب</label>
+                <textarea id="orderDetails" rows="4" placeholder="نوع التطريز، اللون، المقاس..."
+                    class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none transition-all"></textarea>
+            </div>
+
+            <button onclick="sendOrder()"
+                class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-pink-200 transform active:scale-95 transition-all">
+                إرسال الطلب الآن ✨
+            </button>
+
+            <p id="msg" class="text-center font-medium mt-4"></p>
+        </div>
+    </div>
+
+    <script>
+        async function sendOrder() {
+            const btn = document.querySelector('button');
+            const msg = document.getElementById('msg');
+
+            const data = {
+                customer: document.getElementById('customerName').value,
+                details: document.getElementById('orderDetails').value,
+                timestamp: new Date().toISOString()
+            };
+
+            if (!data.customer || !data.details) {
+                msg.innerText = "يرجى تعبئة جميع الخانات ⚠️";
+                msg.className = "text-center font-medium mt-4 text-orange-500";
+                return;
+            }
+
+            try {
+                btn.innerText = "جاري الإرسال...";
+                btn.disabled = true;
+
+                // استبدلي insta-1 بالمفتاح الذي أنشأتيه في الداشبورد
+                const response = await fetch('/receive/insta-1', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    msg.innerText = "تم استلام طلبك بنجاح! شكراً لكِ. ✅";
+                    msg.className = "text-center font-medium mt-4 text-green-600";
+                    document.getElementById('customerName').value = "";
+                    document.getElementById('orderDetails').value = "";
+                }
+            } catch (error) {
+                msg.innerText = "حدث خطأ في الإرسال، حاولي ثانية ❌";
+                msg.className = "text-center font-medium mt-4 text-red-600";
+            } finally {
+                btn.innerText = "إرسال الطلب الآن ✨";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>
