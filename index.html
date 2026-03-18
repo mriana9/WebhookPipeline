@@ -146,7 +146,9 @@
             const data = {
                 name: document.getElementById('p-name').value,
                 sourceKey: document.getElementById('p-key').value,
-                endpointUrl: document.getElementById('p-url').value
+                endpointUrl: document.getElementById('p-url').value,
+                // أضفنا هذا السطر لحل مشكلة قاعدة البيانات
+                action_type: "WEBHOOK"
             };
 
             const res = await fetch('/pipelines', {
@@ -161,6 +163,9 @@
                 document.getElementById('p-name').value = "";
                 document.getElementById('p-key').value = "";
                 document.getElementById('p-url').value = "";
+            } else {
+                const errorData = await res.json();
+                alert("خطأ في الحفظ: " + (errorData.error || "تأكد من البيانات"));
             }
         }
 
