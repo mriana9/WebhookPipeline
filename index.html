@@ -145,27 +145,33 @@
         async function savePipeline() {
             const data = {
                 name: document.getElementById('p-name').value,
-                sourceKey: document.getElementById('p-key').value,
-                endpointUrl: document.getElementById('p-url').value,
-                // أضفنا هذا السطر لحل مشكلة قاعدة البيانات
-                action_type: "WEBHOOK"
+                source_key: document.getElementById('p-key').value, 
+                destination_url: document.getElementById('p-url').value, 
+                action_type: "WEBHOOK",
+                action_config: {} 
             };
 
-            const res = await fetch('/pipelines', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+            try {
+                const res = await fetch('/pipelines', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
 
-            if (res.ok) {
-                toggleModal();
-                loadDashboardData();
-                document.getElementById('p-name').value = "";
-                document.getElementById('p-key').value = "";
-                document.getElementById('p-url').value = "";
-            } else {
-                const errorData = await res.json();
-                alert("خطأ في الحفظ: " + (errorData.error || "تأكد من البيانات"));
+                if (res.ok) {
+                    toggleModal();
+                    loadDashboardData();
+                    document.getElementById('p-name').value = "";
+                    document.getElementById('p-key').value = "";
+                    document.getElementById('p-url').value = "";
+                } else {
+                    const errorText = await res.text();
+                    console.error("Server Error:", errorText);
+                    alert("خطأ من السيرفر: " + errorText);
+                }
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                alert("فشل الاتصال بالسيرفر");
             }
         }
 
