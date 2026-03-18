@@ -25,7 +25,7 @@ RUN npm install --only=production
 # Copy
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/index.html ./index.html
-
+COPY --from=build /app/order.html ./order.html
 #Port 3000
 EXPOSE 3000
 
