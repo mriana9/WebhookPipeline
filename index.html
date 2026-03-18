@@ -1,82 +1,81 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zarkasha Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-</head>
-
-<body class="bg-[#fdfaf6] text-slate-800 font-sans">
-
-    <nav
-        class="bg-white border-b border-rose-100 px-8 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
-        <div class="flex items-center gap-2">
-            <div class="bg-rose-500 p-2 rounded-lg text-white">
-                <i data-lucide="scissors"></i>
-            </div>
-            <h1 class="text-2xl font-bold text-rose-600 tracking-tight">زركشة | Zarkasha</h1>
-        </div>
-        <button
-            class="flex items-center gap-2 bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-full transition-all shadow-md">
-            <i data-lucide="plus-circle"></i>
-            <span>Pipeline جديد</span>
-        </button>
-    </nav>
-
-    <main class="p-8 max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-rose-50 flex items-center gap-4">
-                <div class="bg-green-100 p-3 rounded-xl text-green-600"><i data-lucide="check-circle-2"></i></div>
-                <div>
-                    <p class="text-sm text-slate-500">طلبات مكتملة</p>
-                    <p id="stats-completed" class="text-2xl font-bold">0</p>
-                </div>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-rose-50 flex items-center gap-4">
-                <div class="bg-yellow-100 p-3 rounded-xl text-yellow-600"><i data-lucide="clock"></i></div>
-                <div>
-                    <p class="text-sm text-slate-500">قيد المعالجة</p>
-                    <p id="stats-pending" class="text-2xl font-bold">0</p>
-                </div>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-rose-50 flex items-center gap-4">
-                <div class="bg-red-100 p-3 rounded-xl text-red-600"><i data-lucide="x-circle"></i></div>
-                <div>
-                    <p class="text-sm text-slate-500">طلبات فاشلة</p>
-                    <p id="stats-failed" class="text-2xl font-bold">0</p>
-                </div>
+<div id="pipeline-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-8 w-full max-w-md shadow-2xl">
+        <h2 class="text-xl font-bold mb-4 text-rose-600">إضافة مسار (Pipeline) جديد</h2>
+        <div class="space-y-4">
+            <input type="text" id="p-name" placeholder="اسم المسار (مثلاً: طلبات إنستا)"
+                class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-rose-300">
+            <input type="text" id="p-key" placeholder="المفتاح (Source Key)"
+                class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-rose-300">
+            <input type="text" id="p-url" placeholder="رابط الـ Endpoint"
+                class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-rose-300">
+            <div class="flex gap-2">
+                <button onclick="savePipeline()"
+                    class="flex-1 bg-rose-500 text-white py-3 rounded-lg font-bold">حفظ</button>
+                <button onclick="toggleModal()" class="flex-1 bg-gray-100 text-gray-600 py-3 rounded-lg">إلغاء</button>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-rose-50 overflow-hidden">
-            <div class="px-6 py-4 border-b border-rose-50 flex justify-between items-center">
-                <h2 class="text-lg font-semibold flex items-center gap-2">
-                    <i data-lucide="history" class="text-rose-500"></i>
-                    سجل طلبات زركشة الأخير
-                </h2>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-right border-collapse">
-                    <thead>
-                        <tr class="bg-rose-50/30 text-slate-500 text-sm">
-                            <th class="px-6 py-4 font-medium">الـ ID</th>
-                            <th class="px-6 py-4 font-medium">البيانات (Payload)</th>
-                            <th class="px-6 py-4 font-medium text-center">الحالة</th>
-                            <th class="px-6 py-4 font-medium">التوقيت</th>
+<script>
+    function toggleModal() {
+        const modal = document.getElementById('pipeline-modal');
+        modal.classList.toggle('hidden');
+    }
+
+    document.querySelector('nav button').onclick = toggleModal;
+
+    async function loadDashboardData() {
+        try {
+            const resPipelines = await fetch('/pipelines');
+            const pipelines = await resPipelines.json();
+
+
+            const tableBody = document.getElementById('jobs-table-body');
+
+            if (pipelines.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-10 text-gray-400">لا توجد طلبات بعد.. ابدأي بإضافة Pipeline</td></tr>`;
+            } else {
+                tableBody.innerHTML = pipelines.map(p => `
+                        <tr class="hover:bg-rose-50/20 transition-colors">
+                            <td class="px-6 py-4 font-mono text-xs text-rose-400">#${p.id.slice(0, 8)}</td>
+                            <td class="px-6 py-4 font-medium">${p.name}</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-xs">نشط</span>
+                            </td>
+                            <td class="px-6 py-4 text-slate-400 text-xs">${new Date().toLocaleTimeString('ar-SA')}</td>
                         </tr>
-                    </thead>
-                    <tbody id="jobs-table-body" class="divide-y divide-rose-50 text-sm">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
+                    `).join('');
+            }
 
-    <script src="dist/dashboard.js"></script>
-    <script>lucide.createIcons();</script>
+            lucide.createIcons();
+        } catch (err) {
+            console.error("خطأ في جلب البيانات:", err);
+        }
+    }
+
+    async function savePipeline() {
+        const data = {
+            name: document.getElementById('p-name').value,
+            sourceKey: document.getElementById('p-key').value,
+            endpointUrl: document.getElementById('p-url').value
+        };
+
+        const res = await fetch('/pipelines', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            toggleModal();
+            loadDashboardData(); 
+        }
+    }
+
+    loadDashboardData();
+    setInterval(loadDashboardData, 10000); 
+
+    lucide.createIcons();
+</script>
 </body>
-
-</html>
